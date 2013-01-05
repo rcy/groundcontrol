@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+
+  <body>
+
+    <div id="controls">
+      <h1>Ground Control</h1>
+
+      <div id="location" style="border:solid 1px yellow">
+        <div>My lat: <span class="lat">lat</span></div>
+        <div>My lng: <span class="lng">lng</span></div>
+        <div>My ele: <span class="elevation">ele</span> meters</div>
+      </div>
+
+      <form class="directions">
+        <fieldset>
+          <h3>directions</h3>
+          <div><label>From:<br/><input type="text" name="origin"></label></div>
+          <div><label>To:<br/><input type="text" name="destination"> </label></div>
+          <button type="submit">Get Directions</button>
+        </fieldset>
+      </form>
+    </div>
+
+    <div id="map_wrapper">
+      <div id="map_canvas"></div>
+      <div id="map_elevation">
+        elevation goes here
+      </div>
+    </div>
+
+    <!-- <script src="xhttps://maps.googleapis.com/maps/api/js?key=&sensor=false"></script> -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="jquery.js"></script>
+    <script src="index.js"></script>
+
+    <script>
+      google.load('visualization', '1.0', {'packages':['corechart']});
+      google.load('maps', '3', {'other_params':'sensor=false'});
+
+      google.setOnLoadCallback(initialize);
+    </script>
+
+
+  </body>
+</html>
