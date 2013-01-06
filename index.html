@@ -8,11 +8,11 @@
   <body>
 
     <div id="controls">
-        <h2 style="text-align:center; margin-top: 10px">Ground Control</h2>
+        <h2 style="text-align:center; background: #D8CDBE; padding: 10px; border-bottom: solid 3px #7F5D2B">Ground Control</h2>
       <div style="margin-top: 1em">
 
         <form class="directions">
-          <fieldset>
+          <fieldset style="border: 0">
             <h3>directions</h3>
             <div><label>From:<br/><input type="text" name="origin"></label></div>
             <div><label>To:<br/><input type="text" name="destination"> </label></div>
@@ -21,10 +21,12 @@
         </form>
       </div>
 
-      <div id="location" style="margin-top: 1em; padding: 1em">
-        <div>My lat: <span class="lat">lat</span></div>
-        <div>My lng: <span class="lng">lng</span></div>
-        <div>My ele: <span class="elevation">ele</span> meters</div>
+      <hr>
+
+      <div id="location" style="padding: 1em">
+        <div>My lat: <span style="float:right" class="lat"></span></div>
+        <div>My lng: <span style="float:right" class="lng"></span></div>
+        <div>My ele: <span style="float:right"><span class="elevation"></span> meters</span></div>
       </div>
 
     </div>
