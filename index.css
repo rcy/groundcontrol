@@ -1,8 +1,9 @@
-html { height: 100% }
+html { height: 100%; font-family: mono }
 body { height: 100%; margin: 0; padding: 0 }
 h1,h2,h3 { margin: 0; padding: 0}
+div {margin:0, padding: 0}
 
-#controls { height: 100%; width: 20%; background: #7F5D2B; color: white; float: left }
-#map_wrapper { height: 100%; width: 80%; float: left }
-#map_canvas { height: 75%; width: 100% }
-#map_elevation { height: 25%; width: 100%; background: white}
+#controls { height: 100%; width: 20%; background: white; color: black; float: left; }
+#map_wrapper { height: 100%; width: 80%; float: left; }
+#map_canvas { height: 70%; width: 100%; }
+#map_elevation { height: 30%; width: 100%; background: white; margin:0; padding: 0; overflow: hidden}

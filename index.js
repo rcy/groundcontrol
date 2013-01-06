@@ -2,7 +2,10 @@ var elevator;
 var directionsDisplay;
 var directionsService;
 var map;
-var pointsInPath = 512;
+
+// minimum sample length for elevations.  Less than 100 meters results
+// in a "staircase" effect.
+var sampleLengthMeters = 100
 
 function initialize() {
   // initialize map
@@ -17,6 +20,8 @@ function initialize() {
   directionsDisplay = new google.maps.DirectionsRenderer();
   map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
   directionsDisplay.setMap(map);
+
+  $('form button').removeAttr('disabled');
 
   // var bikeLayer = new google.maps.BicyclingLayer();
   // bikeLayer.setMap(map);
@@ -36,7 +41,7 @@ function initialize() {
     $("#location .lng").text(r.coords.longitude);
 
     // draw a marker on the map at this location
-    var marker = new google.maps.Marker({ position: ll, map: map });
+    //var marker = new google.maps.Marker({ position: ll, map: map });
 
     // show my elevation
     var request = { locations: [ll] };
@@ -49,17 +54,40 @@ function initialize() {
 
 }
 
+var markersArray = [];
 function placeMarker(latLng) {
   console.log('place marker', latLng);
+  clearMarkers();
   var marker = new google.maps.Marker({ position: latLng, map: map });
+  markersArray.push(marker);
+  map.panTo(latLng);
+}
+function clearMarkers() {
+  $.each(markersArray, function(m) {
+    this.setMap(null);
+  });
+  markersArray = [];
+};
+
+var elevationPositionMarker;
+function showElevationPositionMarker(latLng) {
+  if (!elevationPositionMarker)
+    elevationPositionMarker = new google.maps.Marker({
+      position: latLng,
+      map: map
+    });
+  else
+    elevationPositionMarker.setPosition(latLng);
+  elevationPositionMarker.setVisible(true);
+}
+function hideElevationPositionMarker() {
+  if (elevationPositionMarker)
+    elevationPositionMarker.setVisible(false);
 }
 
 function registerEvents() {
-  // google.maps.event.addListener(map, 'click', function(event) {
-  //   placeMarker(event.latLng);
-  // });
-
   $('form.directions').on('submit', function(e) {
+    clearMarkers();
     e.preventDefault();
 
     $form = $(e.currentTarget);
@@ -72,6 +100,7 @@ function registerEvents() {
     var request = {
       origin: origin,
       destination: destination,
+      // travelMode: google.maps.TravelMode.BICYCLING,
       travelMode: google.maps.TravelMode.DRIVING,
       region: 'CA'
     };
@@ -84,7 +113,7 @@ function registerEvents() {
         // get elevation for direction path
         var meters = result.routes[0].legs[0].distance.value;
         var path = result.routes[0].overview_path;
-        var samples = Math.min(512, parseInt(meters / 500));
+        var samples = Math.min(512, parseInt(meters / sampleLengthMeters));
 
         console.log('samples:',samples);
         var request = {
@@ -105,14 +134,38 @@ function registerEvents() {
           var xStep = meters / samples / 1000;
           console.log('xStep',xStep);
           $.each(result, function(i) {
-            data.addRow([Math.round(i * xStep * 10)/10, Math.round(this.elevation*10)/10]);
+            data.addRow([Math.round(i * xStep * 10)/10,
+                         Math.round(this.elevation)]);
           });
 
           var chart = new google.visualization.AreaChart($elevation_div[0]);
           var options = {
-            title: "Elevation profile",
+            title: "Elevation profile from " + origin + " to " + destination,
+            legend: { position: 'none' },
+            curveType: 'function',
+            colors: ['#7F5D2B'],
+            theme: 'maximized',
           };
           chart.draw(data, options);
+          google.visualization.events.addListener(chart, 'onmouseover', function(obj) {
+            var latLng = result[obj.row].location;
+            showElevationPositionMarker(latLng);
+          });
+          google.visualization.events.addListener(chart, 'onmouseout', function(obj) {
+            var latLng = result[obj.row].location;
+            hideElevationPositionMarker();
+          });
+          google.visualization.events.addListener(chart, 'select', function(obj) {
+            var selection = chart.getSelection();
+            if (selection[0]) {
+              var latLng = result[selection[0].row].location;
+              placeMarker(latLng);
+              console.log('chart select', selection);
+            } else {
+              console.log('no selection');
+            }
+          });
+
 
         });
 

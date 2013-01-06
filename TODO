@@ -1,0 +1,31 @@
+* directions / elevation
+DONE click on elevation profile to set point on map
+DONE hover on elevation profile to see point on map
+DONE make sure chart is drawn within y-boundary
+DONE maximize space used on elevation profile div (remove legend, margins)
+
+make trips from click points on map
+
+show loading indicator
+
+show grades emphasized on chart
+show cue sheet
+show errors
+drag alternate routes
+add intermediate waypoints
+add 'km' text to hover on elevation
+
+show axis labels (km and meters elevation)
+add suggestion/completion in directions form
+make frame sizes adjustable (maybe)
+
+* weather
+plan weather integration
+
+* poi
+add buttons to show google places
+add ground control places by clicking on map
+
+* export to pdf
+write mobile app to sync published trips
+
