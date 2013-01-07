@@ -22,9 +22,10 @@ function initialize() {
     overviewMapControl: true,
     panControl: true
   };
-  directionsDisplay = new google.maps.DirectionsRenderer();
   map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-  directionsDisplay.setMap(map);
+
+  var rendererOptions = {map:map, draggable:true};
+  directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
 
   $('form button').removeAttr('disabled');
 
@@ -44,16 +45,6 @@ function initialize() {
     // display current location on sidebar
     $("#location .lat").text(r.coords.latitude);
     $("#location .lng").text(r.coords.longitude);
-
-    // draw a marker on the map at this location
-    //var marker = new google.maps.Marker({ position: ll, map: map });
-
-    // show my elevation
-    var request = { locations: [ll] };
-    elevator.getElevationForLocations(request, function(result, status) {
-      console.log('getel: ', status, result);
-      $("#location .elevation").text(Math.floor(result[0].elevation));
-    });
 
   });
 
@@ -114,69 +105,73 @@ function registerEvents() {
       if (status == google.maps.DirectionsStatus.OK) {
         directionsDisplay.setDirections(result);
         console.log('directions result',result);
-
-        // get elevation for direction path
-        var meters = result.routes[0].legs[0].distance.value;
-        var path = result.routes[0].overview_path;
-        var samples = Math.min(512, parseInt(meters / sampleLengthMeters));
-
-        console.log('samples:',samples);
-        var request = {
-          path: path,
-          samples: samples
-        };
-        console.log('meters:',meters)
-
-        elevator.getElevationAlongPath(request, function(result, status) {
-          console.log('elevation for path: ',status, result);
-
-          var $elevation_div = $("#map_elevation");
-
-          var data = new google.visualization.DataTable();
-          data.addColumn('number', 'kilometers');
-          data.addColumn('number', 'elevation');
-
-          var xStep = meters / samples / 1000;
-          console.log('xStep',xStep);
-          $.each(result, function(i) {
-            data.addRow([Math.round(i * xStep * 10)/10,
-                         Math.round(this.elevation)]);
-          });
-
-          var chart = new google.visualization.AreaChart($elevation_div[0]);
-          var options = {
-            title: "Elevation profile from " + origin + " to " + destination,
-            legend: { position: 'none' },
-            curveType: 'function',
-            colors: ['#7F5D2B'],
-            theme: 'maximized',
-          };
-          chart.draw(data, options);
-          google.visualization.events.addListener(chart, 'onmouseover', function(obj) {
-            var latLng = result[obj.row].location;
-            showElevationPositionMarker(latLng);
-          });
-          google.visualization.events.addListener(chart, 'onmouseout', function(obj) {
-            var latLng = result[obj.row].location;
-            hideElevationPositionMarker();
-          });
-          google.visualization.events.addListener(chart, 'select', function(obj) {
-            var selection = chart.getSelection();
-            if (selection[0]) {
-              var latLng = result[selection[0].row].location;
-              placeMarker(latLng);
-              console.log('chart select', selection);
-            } else {
-              console.log('no selection');
-            }
-          });
-
-
-        });
-
       } else {
         console.log('status: ', status);
       }
+    });
+
+    google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
+      console.log('directions_changed');
+      var result = directionsDisplay.directions;
+
+      // get elevation for direction path
+      var meters = result.routes[0].legs[0].distance.value;
+      var path = result.routes[0].overview_path;
+      var samples = Math.min(50, Math.min(512, parseInt(meters / sampleLengthMeters)));
+
+      console.log('samples:',samples);
+      var request = {
+        path: path,
+        samples: samples
+      };
+      console.log('meters:',meters)
+
+      elevator.getElevationAlongPath(request, function(result, status) {
+        console.log('elevation for path: ',status, result);
+
+        var $elevation_div = $("#map_elevation");
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'kilometers');
+        data.addColumn('number', 'elevation');
+
+        var xStep = meters / samples / 1000;
+        console.log('xStep',xStep);
+        $.each(result, function(i) {
+          data.addRow([Math.round(i * xStep * 10)/10,
+                       Math.round(this.elevation)]);
+        });
+
+        var chart = new google.visualization.AreaChart($elevation_div[0]);
+        var options = {
+          title: "Elevation profile from " + origin + " to " + destination,
+          legend: { position: 'none' },
+          //          curveType: 'function',
+          colors: ['#7F5D2B'],
+          theme: 'maximized',
+        };
+        chart.draw(data, options);
+        google.visualization.events.addListener(chart, 'onmouseover', function(obj) {
+          var latLng = result[obj.row].location;
+          showElevationPositionMarker(latLng);
+        });
+        google.visualization.events.addListener(chart, 'onmouseout', function(obj) {
+          var latLng = result[obj.row].location;
+          hideElevationPositionMarker();
+        });
+        google.visualization.events.addListener(chart, 'select', function(obj) {
+          var selection = chart.getSelection();
+          if (selection[0]) {
+            var latLng = result[selection[0].row].location;
+            placeMarker(latLng);
+            console.log('chart select', selection);
+          } else {
+            console.log('no selection');
+          }
+        });
+
+
+      });
     });
   });
 }

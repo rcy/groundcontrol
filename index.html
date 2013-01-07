@@ -26,7 +26,6 @@
       <div id="location" style="padding: 1em">
         <div>My lat: <span style="float:right" class="lat"></span></div>
         <div>My lng: <span style="float:right" class="lng"></span></div>
-        <div>My ele: <span style="float:right"><span class="elevation"></span> meters</span></div>
       </div>
 
     </div>
@@ -43,7 +42,7 @@
 
     <script>
       google.load('visualization', '1.0', {'packages':['corechart']});
-      google.load('maps', '3.1', {'other_params':'sensor=false'});
+      google.load('maps', '3.1', {'other_params':'sensor=true'});
 
       google.setOnLoadCallback(initialize);
     </script>
