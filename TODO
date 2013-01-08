@@ -3,6 +3,7 @@ DONE click on elevation profile to set point on map
 DONE hover on elevation profile to see point on map
 DONE make sure chart is drawn within y-boundary
 DONE maximize space used on elevation profile div (remove legend, margins)
+DONE drag alternate routes
 
 make trips from click points on map
 
@@ -11,7 +12,6 @@ show loading indicator
 show grades emphasized on chart
 show cue sheet
 show errors
-drag alternate routes
 add intermediate waypoints
 add 'km' text to hover on elevation
 

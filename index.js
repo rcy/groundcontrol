@@ -98,6 +98,7 @@ function registerEvents() {
       destination: destination,
       // travelMode: google.maps.TravelMode.BICYCLING,
       travelMode: google.maps.TravelMode.DRIVING,
+      provideRouteAlternatives: true,
       region: 'CA'
     };
 
